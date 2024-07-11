@@ -34,7 +34,7 @@ app.get('/collectibles/:index', (req, res) => {
 
     const inputIdx = req.params.index;
     if (inputIdx < 3) {
-        return res.send(collectibles[inputIdx]);
+        return res.send('name: ' + collectibles[inputIdx].name + '<br> price: ' + collectibles[inputIdx].price);
     } else {
         return res.send('This item is not yet in stock. Check back soon!');
     }    
@@ -52,36 +52,26 @@ const shoes = [
     { name: "Fifty-Inch Heels", price: 175, type: "heel" }
 ];
 app.get('/shoes', (req, res) => {
-    const typeShoes = [];
-    const maxPriceShoes = [];
-    const minPriceShoes = [];
-
     const noParams = Object.keys(req.query).length;
     if (noParams === 0) { 
         res.send(shoes);
     } 
-    else {
-        for (let j = 0; j < shoes.length; j++) {
-            if (shoes[j].price > req.query.minprice) {
-                minPriceShoes.push(shoes[j].name);
-            }
-            if (shoes[j].price < req.query.maxprice) {
-                maxPriceShoes.push(shoes[j].name);
-            }
-
-            if (shoes[j].type === req.query.type) {
-                typeShoes.push(shoes[j].name)
-            }    
-        }
-        res.send(`shoes above ${req.query.minprice}: ` + minPriceShoes + 
-            `\n shoes undre ${req.query.maxprice}: ` + maxPriceShoes +
-            `\n ${req.query.type} type shoes: ` + typeShoes
-        );
-    }   
-        
-
+    if (req.query['max-price']) {
+        const maxPriceShoes = shoes.filter((s) => s.price < req.query['max-price']);
+        res.send(maxPriceShoes);
+    }
+    if (req.query['min-price']) {
+        const minPriceShoes = shoes.filter((s) => s.price > req.query['min-price']);
+        res.send(minPriceShoes);
+    }
+    if (req.query.type) {
+        const typeShoes = shoes.filter((s) => s.type === req.query.type);
+        res.send(typeShoes);
+    }
 });
 
+app.get('/', (req, res) => {
+    res.send('<h1>Running on 8000</h1>');
+});
 
-app.listen(8000, () => {
-})
+app.listen(8000, (req, res) => {});
